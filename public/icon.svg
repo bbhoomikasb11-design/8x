@@ -1,0 +1,13 @@
+
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="256" cy="256" r="256" fill="#13092e" />
+  <text 
+    x="256" 
+    y="360" 
+    font-family="Playfair Display, serif" 
+    font-style="italic" 
+    font-size="340" 
+    fill="#ffffff" 
+    text-anchor="middle"
+  >A</text>
+</svg>

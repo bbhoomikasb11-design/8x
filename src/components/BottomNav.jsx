@@ -26,7 +26,7 @@ export default function BottomNav({ currentScreen, onSelectScreen }) {
             <span>{tab.label}</span>
             {isActive && (
               <motion.div
-                layoutId="activeNavTab"
+                layoutId="activeTab"
                 className="bottom-nav-active-pill"
                 transition={{ type: 'spring', stiffness: 380, damping: 30 }}
               />

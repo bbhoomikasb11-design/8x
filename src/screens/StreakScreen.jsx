@@ -1,92 +1,131 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { HiFire } from 'react-icons/hi2';
+import { getStreak, getLongestStreak, getTotalDays, getLast35Days } from '../utils/streakEngine';
 import './StreakScreen.css';
 
-export default function StreakScreen() {
-  const [streakCount, setStreakCount] = useState(() => {
-    const saved = localStorage.getItem('affirmme_streak');
-    return saved ? parseInt(saved, 10) : 5; // Default to a 5-day streak for fresh onboarding visual
-  });
+const AnimatedCounter = ({ to }) => {
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    localStorage.setItem('affirmme_streak', streakCount.toString());
-  }, [streakCount]);
+    let startTime;
+    const duration = 600;
 
-  const daysOfWeek = [
-    { label: 'M', completed: true },
-    { label: 'T', completed: true },
-    { label: 'W', completed: true },
-    { label: 'T', completed: true },
-    { label: 'F', completed: true },
-    { label: 'S', completed: false },
-    { label: 'S', completed: false }
-  ];
+    const updateCount = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      setCount(Math.floor(progress * to));
+
+      if (progress < 1) {
+        requestAnimationFrame(updateCount);
+      } else {
+        setCount(to);
+      }
+    };
+
+    requestAnimationFrame(updateCount);
+  }, [to]);
+
+  return <>{count}</>;
+};
+
+export default function StreakScreen() {
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [totalDays, setTotalDays] = useState(0);
+  const [last35, setLast35] = useState([]);
+
+  useEffect(() => {
+    setCurrentStreak(getStreak());
+    setBestStreak(getLongestStreak());
+    setTotalDays(getTotalDays());
+    setLast35(getLast35Days());
+  }, []);
+
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const now = new Date();
+  const monthName = monthNames[now.getMonth()];
+  const year = now.getFullYear();
+
+  const getMotivationalText = (streak) => {
+    if (streak === 0) return { title: "Start today 🌱", subtitle: "Every expert was once a beginner.", tier: "tier-0" };
+    if (streak <= 6) return { title: "Keep going 🔥", subtitle: "You're building something real.", tier: "tier-1" };
+    if (streak <= 20) return { title: "Habit forming 💪", subtitle: "7 days strong. Don't break the chain.", tier: "tier-2" };
+    if (streak <= 29) return { title: "Almost a month! 🌟", subtitle: "This is who you are now.", tier: "tier-3" };
+    return { title: "Unstoppable 🚀", subtitle: "30 days. You've transformed.", tier: "tier-4" };
+  };
+
+  const motivation = getMotivationalText(currentStreak);
+  const weekLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
   return (
     <div className="streak-screen">
       <div className="streak-noise" />
 
-      {/* Screen Header */}
       <div className="streak-header">
         <h1>Streak</h1>
       </div>
 
-      <div className="streak-content">
-        {/* Flame visual */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-          className="streak-flame-card"
-        >
-          <motion.div
-            animate={{
-              scale: [1, 1.05, 1],
-              filter: [
-                'drop-shadow(0 0 15px rgba(255, 102, 0, 0.4))',
-                'drop-shadow(0 0 25px rgba(255, 102, 0, 0.6))',
-                'drop-shadow(0 0 15px rgba(255, 102, 0, 0.4))'
-              ]
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 2,
-              ease: 'easeInOut'
-            }}
-            className="streak-flame-glow"
-          >
-            🔥
-          </motion.div>
-          <div className="streak-number">{streakCount}</div>
-          <div className="streak-label">Day Streak</div>
-        </motion.div>
-
-        {/* Calendar Habit Row */}
-        <div className="streak-calendar-row">
-          {daysOfWeek.map((day, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`calendar-day-pill ${day.completed ? 'completed' : ''}`}
-            >
-              <span className="day-letter">{day.label}</span>
-              <div className="check-dot" />
-            </motion.div>
-          ))}
+      <div className="streak-scroll-container">
+        
+        {/* Stat cards row */}
+        <div className="streak-stats-row">
+          <div className="stat-card">
+            <div className="stat-number"><AnimatedCounter to={currentStreak} /></div>
+            <div className="stat-label">🔥 Current</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number"><AnimatedCounter to={bestStreak} /></div>
+            <div className="stat-label">⭐ Best</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number"><AnimatedCounter to={totalDays} /></div>
+            <div className="stat-label">📅 Total</div>
+          </div>
         </div>
 
-        {/* Bottom mindfulness focus quote */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.7 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="streak-quote"
-        >
-          "Consistency is the key to carving new pathways in the mind. Keep standing in your truth."
-        </motion.p>
+        {/* Calendar section */}
+        <div className="calendar-section">
+          <div className="calendar-heading">{monthName} {year}</div>
+          <div className="calendar-weekdays">
+            {weekLabels.map((l, i) => <div key={i} className="weekday-label">{l}</div>)}
+          </div>
+          <div className="calendar-grid">
+            {last35.map((day, i) => {
+              if (day.isFuture) {
+                return <div key={i} className="calendar-square future" />;
+              }
+
+              // Parse carefully to avoid timezone issues
+              // date string is YYYY-MM-DD
+              const dParts = day.date.split('-');
+              const dParsed = new Date(dParts[0], dParts[1] - 1, dParts[2]);
+              const dateStringParts = dParsed.toDateString().split(' '); // e.g. "Thu May 22 2026"
+              const tooltipText = `${dateStringParts[0]}, ${dParsed.getDate()} ${dateStringParts[1]}${day.logged ? ' ✓' : ''}`;
+
+              let classes = 'calendar-square';
+              if (day.logged) classes += ' logged';
+              if (day.isToday) classes += ' today';
+              
+              return (
+                <motion.div
+                  key={i}
+                  className={classes}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: i * 0.015, type: 'spring', stiffness: 300, damping: 20 }}
+                  data-tooltip={tooltipText}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Motivational section */}
+        <div className={`motivation-card ${motivation.tier}`}>
+          <div className="motivation-title">{motivation.title}</div>
+          <div className="motivation-subtitle">{motivation.subtitle}</div>
+        </div>
+
       </div>
     </div>
   );

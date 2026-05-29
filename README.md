@@ -1,16 +1,19 @@
-# React + Vite
+# AffirmMe — Daily Affirmations App
+> Built for the 8x Engineer challenge, May 2026
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Features
+- 72 personalized affirmations across 6 categories
+- Full-screen swipeable cards with haptic + audio feedback  
+- Daily streak tracker with calendar heatmap
+- Favorites collection with persistence
+- Push notification reminders
+- PWA installable
 
-Currently, two official plugins are available:
+## Stack
+React 18 + Vite · Framer Motion · Service Workers · localStorage
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run locally
+npm install && npm run dev
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## AI Logs
+All Claude Code sessions are in /ai-logs/

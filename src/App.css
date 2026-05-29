@@ -14,3 +14,31 @@
   position: relative;
   overflow: hidden;
 }
+
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(ellipse at center, #1a0a3b 0%, #0D0920 70%);
+  z-index: 9999;
+}
+.splash-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 44px;
+  color: #fff;
+  margin: 0;
+}
+.splash-subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+

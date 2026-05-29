@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiHeart, HiXMark } from 'react-icons/hi2';
+import { HiHeart, HiOutlineHeart, HiXMark } from 'react-icons/hi2';
 import affirmations from '../data/affirmations';
 import useFavorites from '../hooks/useFavorites';
 import './FavoritesScreen.css';
@@ -39,9 +39,9 @@ export default function FavoritesScreen() {
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               className="favorites-empty-state"
             >
-              <HiHeart className="empty-heart-icon" />
+              <HiOutlineHeart className="empty-heart-icon" />
               <h2 className="empty-title">Nothing saved yet</h2>
-              <p className="empty-subtitle">Double-tap any card or tap the heart icon to save it</p>
+              <p className="empty-subtitle">Double-tap any card to save it</p>
             </motion.div>
           ) : (
             savedAffirmations.map((item, index) => (

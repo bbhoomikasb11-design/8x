@@ -1,9 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaHeart, FaRegHeart, FaShareAlt, FaChevronRight } from 'react-icons/fa';
+import { HiCog6Tooth } from 'react-icons/hi2';
 import affirmations from '../data/affirmations';
 import CategoryBar from '../components/CategoryBar';
 import useFavorites from '../hooks/useFavorites';
+import { logToday } from '../utils/streakEngine';
+import SettingsScreen from './SettingsScreen';
 import './CardScreen.css';
 
 export default function CardScreen() {
@@ -12,6 +15,7 @@ export default function CardScreen() {
   const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
   const [activeCategory, setActiveCategory] = useState('all');
   const [showHeartBurst, setShowHeartBurst] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const lastTapRef = useRef(0);
 
   // Filter affirmations based on category
@@ -36,14 +40,37 @@ export default function CardScreen() {
     }
   };
 
+  const playFeedback = () => {
+    // Haptics
+    navigator.vibrate?.(10);
+    // Audio
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 523;
+      gain.gain.value = 0.04;
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } catch (e) {
+      console.warn("Audio feedback failed:", e);
+    }
+  };
+
   const handleNext = () => {
     if (filteredAffirmations.length <= 1) return;
+    logToday();
+    playFeedback();
     setDirection(1);
     setCurrentIndex(prev => (prev + 1) % filteredAffirmations.length);
   };
 
   const handlePrev = () => {
     if (filteredAffirmations.length <= 1) return;
+    logToday();
+    playFeedback();
     setDirection(-1);
     setCurrentIndex(prev => (prev - 1 + filteredAffirmations.length) % filteredAffirmations.length);
   };
@@ -165,6 +192,15 @@ export default function CardScreen() {
     <div className="card-screen-container" style={backgroundStyle}>
       <div className="noise-overlay" />
 
+      {/* Settings Gear */}
+      <button 
+        className="settings-gear-btn" 
+        onClick={() => setShowSettings(true)}
+        aria-label="Settings"
+      >
+        <HiCog6Tooth />
+      </button>
+
       {/* Category selector at screen top */}
       <CategoryBar activeCategory={activeCategory} onSelectCategory={setActiveCategory} />
 
@@ -215,6 +251,16 @@ export default function CardScreen() {
               </div>
 
               <div className="card-content">
+                {/* Floating Particles */}
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="card-particle" style={{
+                    left: `${Math.random() * 80 + 10}%`,
+                    top: `${Math.random() * 80 + 10}%`,
+                    animationDelay: `${Math.random() * 5}s`,
+                    animationDuration: `${4 + Math.random() * 3}s`
+                  }} />
+                ))}
+
                 {!startsWithIAm(currentCard.text) && (
                   <span className="prefix-i-am">I Am</span>
                 )}
@@ -301,6 +347,10 @@ export default function CardScreen() {
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {showSettings && <SettingsScreen onClose={() => setShowSettings(false)} />}
+      </AnimatePresence>
     </div>
   );
 }

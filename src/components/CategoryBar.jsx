@@ -28,7 +28,7 @@ export default function CategoryBar({ activeCategory, onSelectCategory }) {
               <span>{cat.label}</span>
               {isActive && (
                 <motion.div
-                  layoutId="activeCategoryIndicator"
+                  layoutId="activePill"
                   className="active-pill-bg"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                 />
