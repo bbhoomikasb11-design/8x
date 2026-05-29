@@ -3,23 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaHeart, FaRegHeart, FaShareAlt, FaChevronRight } from 'react-icons/fa';
 import affirmations from '../data/affirmations';
 import CategoryBar from '../components/CategoryBar';
+import useFavorites from '../hooks/useFavorites';
 import './CardScreen.css';
 
 export default function CardScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1); // 1 = next, -1 = prev
-  const [favorites, setFavorites] = useState(() => {
-    const saved = localStorage.getItem('affirmme_favorites');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
   const [activeCategory, setActiveCategory] = useState('all');
   const [showHeartBurst, setShowHeartBurst] = useState(false);
   const lastTapRef = useRef(0);
-
-  // Save favorites to localStorage
-  useEffect(() => {
-    localStorage.setItem('affirmme_favorites', JSON.stringify(favorites));
-  }, [favorites]);
 
   // Filter affirmations based on category
   const filteredAffirmations = activeCategory === 'all'
@@ -36,13 +29,11 @@ export default function CardScreen() {
   const currentCard = filteredAffirmations[currentIndex] || null;
 
   const toggleFavorite = (id) => {
-    setFavorites(prev => {
-      if (prev.includes(id)) {
-        return prev.filter(fId => fId !== id);
-      } else {
-        return [...prev, id];
-      }
-    });
+    if (isFavorite(id)) {
+      removeFavorite(id);
+    } else {
+      addFavorite(id);
+    }
   };
 
   const handleNext = () => {
@@ -160,7 +151,7 @@ export default function CardScreen() {
     return dots;
   };
 
-  const isCurrentCardFavorited = currentCard ? favorites.includes(currentCard.id) : false;
+  const isCurrentCardFavorited = currentCard ? isFavorite(currentCard.id) : false;
 
   // Background gradient dynamic calculation
   const defaultGradient = ['#0D0920', '#13092e'];
