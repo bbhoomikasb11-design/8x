@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaHeart, FaRegHeart, FaShareAlt, FaChevronRight } from 'react-icons/fa';
 import affirmations from '../data/affirmations';
+import CategoryBar from '../components/CategoryBar';
 import './CardScreen.css';
 
 export default function CardScreen() {
@@ -62,7 +63,7 @@ export default function CardScreen() {
       // Swiped left -> Go to next card
       handleNext();
     } else if (info.offset.x > swipeThreshold) {
-      // Swiped right -> Go to previous card (or next if user strictly wants next)
+      // Swiped right -> Go to previous card
       handlePrev();
     }
   };
@@ -77,7 +78,7 @@ export default function CardScreen() {
       const isAlreadyFav = favorites.includes(currentCard.id);
       toggleFavorite(currentCard.id);
       
-      // Only show heart burst on favoriting (or both, let's show it on both but it looks great)
+      // Only show heart burst on favoriting
       if (!isAlreadyFav) {
         setShowHeartBurst(true);
         setTimeout(() => setShowHeartBurst(false), 500);
@@ -107,18 +108,6 @@ export default function CardScreen() {
   const startsWithIAm = (text) => {
     return text.toLowerCase().trim().startsWith('i am');
   };
-
-  // Categories list for top filter
-  const categories = [
-    { id: 'all', label: 'All' },
-    { id: 'confidence', label: 'Confidence' },
-    { id: 'gratitude', label: 'Gratitude' },
-    { id: 'health', label: 'Health' },
-    { id: 'love', label: 'Love' },
-    { id: 'success', label: 'Success' },
-    { id: 'calm', label: 'Calm' },
-    { id: 'favorites', label: 'Favorites' }
-  ];
 
   // Motion variants for sliding cards
   const cardVariants = {
@@ -185,18 +174,8 @@ export default function CardScreen() {
     <div className="card-screen-container" style={backgroundStyle}>
       <div className="noise-overlay" />
 
-      {/* Elegant horizontal scroll category selector */}
-      <div className="category-filter-bar">
-        {categories.map(cat => (
-          <button
-            key={cat.id}
-            className={`category-tab ${activeCategory === cat.id ? 'active' : ''}`}
-            onClick={() => setActiveCategory(cat.id)}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
+      {/* Category selector at screen top */}
+      <CategoryBar activeCategory={activeCategory} onSelectCategory={setActiveCategory} />
 
       <div className="card-wrapper">
         <AnimatePresence initial={false} custom={direction} mode="wait">
